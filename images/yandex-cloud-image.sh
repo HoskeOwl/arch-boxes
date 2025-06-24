@@ -1,6 +1,6 @@
 #!/bin/bash
 # shellcheck disable=SC2034,SC2154
-IMAGE_NAME="Arch-Linux-x86_64-cloudimg-${build_version}.qcow2"
+IMAGE_NAME="Arch-Linux-x86_64-yandex-cloudimg-${build_version}.qcow2"
 DISK_SIZE=""
 # The following modules require additional packages:
 # - growpart[1] requires the cloud-guest-utils package
@@ -15,6 +15,7 @@ function pre() {
   echo 'GRUB_TERMINAL="serial console"' >>"${MOUNT}/etc/default/grub"
   echo 'GRUB_SERIAL_COMMAND="serial --speed=115200"' >>"${MOUNT}/etc/default/grub"
   arch-chroot "${MOUNT}" /usr/bin/grub-mkconfig -o /boot/grub/grub.cfg
+  mkdir -p "${MOUNT}/etc/cloud/cloud.cfg.d"
   echo -e "datasource:\n Ec2:\n  strict_id: false" >"${MOUNT}/etc/cloud/cloud.cfg.d/00_ec2.yaml"
   echo -e "datasource_list: [ Ec2, NoCloud, GCE, None ]" >"${MOUNT}/etc/cloud/cloud.cfg.d/90_ec2.yaml"
 }
