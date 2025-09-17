@@ -16,6 +16,15 @@ The basic image is meant for local usage and comes preconfigured with the user `
 #### Cloud image
 The cloud image is meant to be used in "the cloud" and comes with [`cloud-init`](https://cloud-init.io/) preinstalled. For tested cloud providers and instructions please see the [ArchWiki's Arch Linux on a VPS page](https://wiki.archlinux.org/title/Arch_Linux_on_a_VPS#Official_Arch_Linux_cloud_image).
 
+#### Yandex Cloud image
+The Yandex Cloud image is specifically optimized for Yandex Cloud platform and comes with [`cloud-init`](https://cloud-init.io/) preinstalled and configured for Yandex Cloud's EC2-compatible metadata service. This image includes:
+- Cloud-init with EC2 datasource configuration
+- Serial console support for Yandex Cloud
+- Cloud-init 25.1+ compatibility fixes (includes `ds-identify.cfg` configuration)
+- Required packages: `cloud-init`, `cloud-guest-utils`, `gptfdisk`
+
+**Note:** This image has been updated to address breaking changes in cloud-init 25.1.4, ensuring compatibility with the latest cloud-init versions.
+
 ## Development
 
 ### Dependencies
@@ -33,6 +42,20 @@ You'll need the following dependencies:
 The official builds are done in our Arch Linux GitLab CI and can be built locally by running (as root):
 
     ./build.sh
+
+#### Selective image building
+You can build specific images by setting the `IMAGES` environment variable with a comma-separated list of image names:
+
+    IMAGES="cloud-image,basic" ./build.sh
+    IMAGES="yandex-cloud-image" ./build.sh
+
+Available image types:
+- `basic` - Basic image for local usage
+- `cloud-image` - Generic cloud image
+- `yandex-cloud-image` - Yandex Cloud optimized image
+- `libvirt-executor` - GitLab CI runner image with git, git-lfs, and gitlab-runner preinstalled
+
+If no `IMAGES` variable is set, all images will be built by default.
 
 # Releases
 
