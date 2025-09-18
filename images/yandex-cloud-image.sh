@@ -20,7 +20,7 @@ function pre() {
   echo -e "datasource_list: [ Ec2 ]\ndatasource:\n  Ec2:\n    strict_id: false" > "${MOUNT}/etc/cloud/cloud.cfg.d/90_datasource.cfg"
   # because of breack changes in cloud-init 25.1.4
   # https://cloudinit.readthedocs.io/en/latest/reference/breaking_changes.html
-  echo -e "policy: search,found=all,maybe=all,notfound=enabled\n" > "${MOUNT}/etc/cloud/ds-identify.cfg"
+  echo -e "policy: search,found=all,maybe=all,notfound=disabled\n" > "${MOUNT}/etc/cloud/ds-identify.cfg"
 
 
   sed -Ei 's/^(GRUB_CMDLINE_LINUX_DEFAULT=.*)"$/\1 console=tty0 console=ttyS0,115200"/' "${MOUNT}/etc/default/grub"
