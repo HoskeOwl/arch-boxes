@@ -221,14 +221,6 @@ Notes:
   - Available images are automatically detected from the images/ directory
   - The 'base' image cannot be selected as it's used internally
 
-Package requirements:
-  - arch-install-scripts
-  - btrfs-progs
-  - dosfstools
-  - gptfdisk
-  - jq
-  - qemu-img
-
 EOF
 }
 
@@ -271,7 +263,7 @@ function main() {
   # Determine which image scripts to use
   local image_scripts=()
   if [ -n "${IMAGES:-}" ]; then
-    IFS=',' read -ra user_images <<< "$IMAGES"
+    IFS=',' read -ra user_images <<<"$IMAGES"
     for img in "${user_images[@]}"; do
       if [[ "$img" == "base" ]]; then
         echo "Error: 'base' image cannot be selected for execution." >&2
@@ -296,6 +288,7 @@ function main() {
   for image in "${image_scripts[@]}"; do
     # shellcheck source=/dev/null
     source "${image}"
+    # shellcheck disable=SC2153
     create_image "${IMAGE_NAME}" pre post
   done
 }
