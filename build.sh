@@ -2,6 +2,8 @@
 # Build virtual machine images (basic image, cloud image etc.)
 # IMAGES="cloud-image,basic" ./build.sh
 # ./build.sh to build all images
+# ./build.sh list to show all available image options
+# ./build.sh help to show usage information
 
 # nounset: "Treat unset variables and parameters [...] as an error when performing parameter expansion."
 # errexit: "Exit immediately if [...] command exits with a non-zero status."
@@ -176,8 +178,74 @@ function create_image() {
   mv_to_output "${1}"
 }
 
+# List all available image options
+function list_images() {
+  echo "Available image options for IMAGES variable:"
+  shopt -s nullglob
+  for image in "${ORIG_PWD}/images/"!(base).sh; do
+    local image_name
+    image_name="$(basename "${image}" .sh)"
+    echo "  - ${image_name}"
+  done
+  shopt -u nullglob
+}
+
+# Show help information
+function show_help() {
+  cat <<EOF
+Usage: $0 [COMMAND] [BUILD_VERSION]
+
+Commands:
+  list              List all available image options for IMAGES variable
+  help              Show this help message
+  (none)            Build virtual machine images
+
+Arguments:
+  BUILD_VERSION     Optional build version (default: YYYYMMDD.0)
+
+Environment Variables:
+  IMAGES            Comma-separated list of image types to build
+                    (default: all available images except base)
+
+Examples:
+  $0                           # Build all images with default version
+  $0 20241201.1                # Build all images with specific version
+  $0 list                      # List available image options
+  $0 help                      # Show this help message
+  IMAGES="cloud-image,basic" $0 # Build only cloud-image and basic
+  IMAGES="yandex-cloud-image" $0 20241201.1 # Build yandex-cloud-image with version
+
+Notes:
+  - Requires root privileges for building images
+  - The 'list' and 'help' commands work without root privileges
+  - Available images are automatically detected from the images/ directory
+  - The 'base' image cannot be selected as it's used internally
+
+Package requirements:
+  - arch-install-scripts
+  - btrfs-progs
+  - dosfstools
+  - gptfdisk
+  - jq
+  - qemu-img
+
+EOF
+}
+
 # ${1} - Optional build version. If not set, will generate a default based on date.
 function main() {
+  # Check for 'list' command
+  if [ "${1:-}" = "list" ]; then
+    list_images
+    exit 0
+  fi
+
+  # Check for 'help' command
+  if [ "${1:-}" = "help" ] || [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
+    show_help
+    exit 0
+  fi
+
   if [ "$(id -u)" -ne 0 ]; then
     echo "root is required"
     exit 1
