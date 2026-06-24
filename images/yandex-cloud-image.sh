@@ -1,7 +1,8 @@
 #!/bin/bash
 # shellcheck disable=SC2034,SC2154
 IMAGE_NAME="Arch-Linux-x86_64-yandex-cloudimg-${build_version}.qcow2"
-DISK_SIZE=""
+DISK_SIZE="${YC_DISK_SIZE}"
+echo "Yandex Cloud disk size: ${DISK_SIZE:-unset (using base image size)}"
 # The following modules require additional packages:
 # - growpart[1] requires the cloud-guest-utils package
 # - disk setup[2] requires the sgdisk package
@@ -15,6 +16,9 @@ function pre() {
   # export ROOT_PASSWORD=$(gpg --gen-random --armor 1 15)
   # echo "password: '${ROOT_PASSWORD}'"
   # arch-chroot "${MOUNT}" bash -c "echo '${ROOT_PASSWORD}' | passwd --stdin root"
+  #
+  echo 'Server = https://mirror.rackspace.com/archlinux/$repo/os/$arch' \
+        > "${MOUNT}/etc/pacman.d/mirrorlist"
 
   mkdir -p "${MOUNT}/etc/cloud/cloud.cfg.d"
   echo -e "datasource_list: [ Ec2 ]\ndatasource:\n  Ec2:\n    strict_id: false" > "${MOUNT}/etc/cloud/cloud.cfg.d/90_datasource.cfg"
